@@ -254,6 +254,24 @@
             <label for="phone">Phone Number:</label>
             <input type="tel" id="phone" name="phone" required />
           </div>
+          <div class="form-group">
+            <label for="emergencyContact">Emergency Contact Email:</label>
+            <input
+              type="email"
+              id="emergencyContact"
+              name="emergencyContact"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="emergencyPhone">Emergency Contact Phone:</label>
+            <input
+              type="tel"
+              id="emergencyPhone"
+              name="emergencyPhone"
+              required
+            />
+          </div>
           <button type="submit">Submit</button>
         </form>
       </div>
@@ -281,7 +299,19 @@
           e.preventDefault();
           var email = document.getElementById("email").value;
           var phone = document.getElementById("phone").value;
-          console.log("Email:", email, "Phone:", phone);
+          var emergencyContact =
+            document.getElementById("emergencyContact").value;
+          var emergencyPhone = document.getElementById("emergencyPhone").value;
+          console.log(
+            "Email:",
+            email,
+            "Phone:",
+            phone,
+            "Emergency Contact:",
+            emergencyContact,
+            "Emergency Phone:",
+            emergencyPhone
+          );
           modal.style.display = "none";
         });
     </script>
