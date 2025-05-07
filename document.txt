@@ -1,0 +1,205 @@
+# CarPooling DApp Documentation
+
+## 1. Project Structure
+```
+carpooling-dapp/
+├── contracts/
+│   └── Auth.sol          # Smart contract for authentication
+├── migrations/
+│   └── 2_deploy_contracts.js  # Deployment script
+├── truffle-config.js     # Truffle configuration
+├── login.html            # Login/Register page
+├── passengerpanel.html   # Passenger dashboard
+└── test-connection.js    # Network testing script
+```
+
+## 2. Smart Contract Details
+- Contract Name: Auth.sol
+- Contract Address: 0xfcc30f35e9eac49200e76e4e4e5a7d48309b6203
+- Functions:
+  - registerUser()
+  - loginUser()
+  - isUserRegistered()
+  - getUserDetails()
+
+## 3. Setup Instructions
+
+### A. Install Required Tools
+```bash
+# Install Truffle globally
+npm install -g truffle
+
+# Install Ganache globally
+npm install -g ganache
+
+# Install Web3.js
+npm install web3
+```
+
+### B. Start Ganache
+```bash
+# First, kill any existing Ganache processes
+taskkill /F /IM node.exe
+
+# Start Ganache on port 8546
+ganache --port 8546
+```
+
+Expected Ganache Output:
+```
+Available Accounts
+==================
+(0) 0xfEE0bfCB18A2A3154CFE2a847b9d7812c92060b3 (1000 ETH)
+(1) 0xB88693415fDF434D0Bc50cd67C5E0218CeaDB33C (1000 ETH)
+...
+Private Keys
+==================
+(0) 0x73d44bd5e45daf64991d5a7e6973b4b97123a5704143142983d8a404a99c6fec
+(1) 0x0d9aa5ae5d505038e01687b85d5ea65bb8c9636f8086ff2e6e262cb721749996
+...
+```
+
+### C. Configure MetaMask
+1. Open MetaMask
+2. Click on Network dropdown
+3. Click "Add Network"
+4. Fill in these details:
+   ```
+   Network Name: Ganache
+   RPC URL: http://127.0.0.1:8546
+   Chain ID: 1337
+   Currency Symbol: ETH
+   ```
+
+### D. Import Account to MetaMask
+1. In MetaMask, click on the circle icon (top-right)
+2. Click "Import Account"
+3. Select "Private Key"
+4. Paste this private key:
+   ```
+   73d44bd5e45daf64991d5a7e6973b4b97123a5704143142983d8a404a99c6fec
+   ```
+5. Click "Import"
+
+### E. Deploy Smart Contract
+```bash
+# Compile and deploy contract
+truffle migrate --network development
+```
+
+Expected Output:
+```
+Contract created: 0xfcc30f35e9eac49200e76e4e4e5a7d48309b6203
+```
+
+## 4. Testing the Setup
+
+### A. Test Network Connection
+```bash
+# Run the test script
+node test-connection.js
+```
+
+Expected Output:
+```
+Chain ID: 1337
+Available accounts: [addresses...]
+Balance of first account: 1000 ETH
+Current block number: 1
+```
+
+### B. Test Contract Deployment
+```bash
+# Verify contract deployment
+truffle console --network development
+> const auth = await Auth.deployed()
+> auth.address
+'0xfcc30f35e9eac49200e76e4e4e5a7d48309b6203'
+```
+
+## 5. Running the Application
+
+1. Make sure Ganache is running:
+   ```bash
+   ganache --port 8546
+   ```
+
+2. Open `login.html` in your browser
+
+3. Connect MetaMask:
+   - Click "Connect Wallet"
+   - Approve the connection request
+
+4. Test Registration:
+   - Fill in the registration form
+   - Submit the transaction
+   - Approve in MetaMask
+
+5. Test Login:
+   - Enter your registered email
+   - Click Login
+   - You should be redirected to passengerpanel.html
+
+## 6. Troubleshooting
+
+### Common Issues and Solutions:
+
+1. Ganache Won't Start:
+   ```bash
+   # Kill existing processes
+   taskkill /F /IM node.exe
+   
+   # Start Ganache again
+   ganache --port 8546
+   ```
+
+2. MetaMask Connection Issues:
+   - Check if you're on the correct network (Ganache)
+   - Verify the RPC URL is correct
+   - Try disconnecting and reconnecting the wallet
+
+3. Contract Deployment Fails:
+   - Check if Ganache is running
+   - Verify the port in truffle-config.js
+   - Try resetting Ganache:
+     ```bash
+     ganache --port 8546 --reset
+     ```
+
+## 7. Important Notes
+
+1. Contract Address: Always use the latest deployed contract address
+2. Network: Make sure you're always on the Ganache network
+3. Accounts: Keep track of which account you're using
+4. Private Keys: Never share your private keys
+5. Gas: Transactions require gas, but it's free on Ganache
+
+## 8. Current Configuration
+
+- Ganache Port: 8546
+- Chain ID: 1337
+- Contract Address: 0xfcc30f35e9eac49200e76e4e4e5a7d48309b6203
+- Main Account: 0xfEE0bfCB18A2A3154CFE2a847b9d7812c92060b3
+
+## 9. Known Issues
+
+1. µWS Compatibility Warning:
+   ```
+   This version of µWS is not compatible with your Node.js build
+   ```
+   This is a known warning and doesn't affect functionality. Ganache will fall back to a NodeJS implementation.
+
+2. EADDRINUSE Error:
+   If you see "address already in use" error, use:
+   ```bash
+   taskkill /F /IM node.exe
+   ganache --port 8546
+   ```
+
+## 10. Support
+
+For any issues or questions:
+1. Check the troubleshooting section
+2. Verify all configurations match the documentation
+3. Ensure MetaMask is properly configured
+4. Make sure Ganache is running on the correct port 

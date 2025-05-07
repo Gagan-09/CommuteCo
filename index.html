@@ -66,9 +66,13 @@
         display: block;
         margin-bottom: 5px;
         font-weight: bold;
+        color: #ffa500;
       }
 
-      input[type="text"] {
+      input[type="text"],
+      input[type="email"],
+      input[type="tel"],
+      select {
         width: 100%;
         padding: 10px;
         border: 1px solid #ccc;
@@ -104,8 +108,31 @@
       .new-user a:hover {
         text-decoration: underline;
       }
-      label {
-        color: #ffa500;
+
+      .wallet-button {
+        background-color: #f7931a;
+        margin-bottom: 20px;
+      }
+
+      .wallet-button:hover {
+        background-color: #d67e0d;
+      }
+
+      .form-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .user-address {
+        font-size: 0.8rem;
+        color: #666;
+        word-break: break-all;
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        display: none;
       }
     </style>
   </head>
@@ -120,19 +147,119 @@
           <h1>LOGIN TO</h1>
           <img src="logo.png" alt="Logo" />
         </div>
-        <form>
+        <form id="loginForm">
           <div class="form-group">
-            <label for="useraddress">USER ADDRESS:</label>
-            <input type="text" id="useraddress" name="useraddress" required />
+            <label for="email">EMAIL:</label>
+            <input type="email" id="email" name="email" required />
           </div>
-          <button type="submit">Login</button>
+          <div class="form-group">
+            <label for="phone">PHONE NUMBER:</label>
+            <input type="tel" id="phone" name="phone" required />
+          </div>
+          <div class="form-group">
+            <label for="role">SELECT ROLE:</label>
+            <select id="role" name="role" required>
+              <option value="">Select a role</option>
+              <option value="driver">Driver</option>
+              <option value="passenger">Passenger</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="wallet-button" id="connectWallet">
+              Connect Wallet
+            </button>
+            <div id="userAddress" class="user-address"></div>
+            <button type="submit">Login</button>
+          </div>
         </form>
         <div class="new-user">
           <p>
-            New to CommuteCo? <a href="register.html">Create an account!</a>
+            New to CommuteCo?
+            <a href="#" id="registerLink">Create an account!</a>
           </p>
         </div>
       </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script>
+      // Check if MetaMask is installed
+      if (typeof window.ethereum === "undefined") {
+        alert("Please install MetaMask to use this application!");
+      }
+
+      // Connect Wallet Button Handler
+      document
+        .getElementById("connectWallet")
+        .addEventListener("click", async () => {
+          try {
+            // Request account access
+            const accounts = await window.ethereum.request({
+              method: "eth_requestAccounts",
+            });
+            const userAddress = accounts[0];
+
+            // Display the connected address
+            const addressDisplay = document.getElementById("userAddress");
+            addressDisplay.textContent = `Connected: ${userAddress}`;
+            addressDisplay.style.display = "block";
+
+            // Update the connect button
+            document.getElementById("connectWallet").textContent =
+              "Wallet Connected";
+            document.getElementById("connectWallet").disabled = true;
+          } catch (error) {
+            console.error("Error connecting wallet:", error);
+            alert("Failed to connect wallet. Please try again.");
+          }
+        });
+
+      // Form Submission Handler
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const email = document.getElementById("email").value;
+          const phone = document.getElementById("phone").value;
+          const role = document.getElementById("role").value;
+          const userAddress = document
+            .getElementById("userAddress")
+            .textContent.replace("Connected: ", "");
+
+          if (!userAddress) {
+            alert("Please connect your wallet first!");
+            return;
+          }
+
+          if (!role) {
+            alert("Please select a role!");
+            return;
+          }
+
+          try {
+            // Here you would typically interact with your smart contract
+            // For now, we'll just show a success message and redirect
+            alert("Login successful!");
+
+            // Redirect based on role
+            if (role === "driver") {
+              window.location.replace("driverpanel.html");
+            } else if (role === "passenger") {
+              window.location.replace("passengerpanel.html");
+            }
+          } catch (error) {
+            console.error("Login error:", error);
+            alert("Login failed. Please try again.");
+          }
+        });
+
+      // Register Link Handler
+      document.getElementById("registerLink").addEventListener("click", (e) => {
+        e.preventDefault();
+        // You can add registration logic here or redirect to a registration page
+        alert("Registration feature coming soon!");
+      });
+    </script>
   </body>
 </html>

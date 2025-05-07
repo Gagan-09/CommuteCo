@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CarPooling - Login/Register</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: linear-gradient(-45deg, #ff7e5f, #feb47b, #fceabb, #00c6ff);
+        background-size: 400% 400%;
+        animation: gradientBG 8s ease infinite;
+        color: #333;
+      }
+
+      @keyframes gradientBG {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        padding: 30px;
+        width: 500px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        text-align: center;
+        animation: fadeIn 1.5s ease;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+        text-align: left;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="tel"],
+      input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+      }
+
+      .login-btn {
+        background: linear-gradient(to right, #4facfe, #00f2fe);
+        color: white;
+      }
+
+      .register-btn {
+        background: linear-gradient(to right, #ff7e5f, #feb47b);
+        color: white;
+      }
+
+      .connect-wallet {
+        background: linear-gradient(to right, #ff512f, #dd2476);
+        color: white;
+        margin-bottom: 20px;
+      }
+
+      .tabs {
+        display: flex;
+        margin-bottom: 20px;
+      }
+
+      .tab {
+        flex: 1;
+        padding: 10px;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+        margin: 0 5px;
+      }
+
+      .tab.active {
+        background: rgba(255, 255, 255, 0.4);
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo">
+        <img src="logo.png" alt="Logo" style="width: 200px; height: 200px" />
+      </div>
+      <h1>CarPooling</h1>
+
+      <button class="connect-wallet" onclick="connectWallet()">
+        Connect Wallet
+      </button>
+
+      <div class="tabs">
+        <div class="tab active" onclick="showLogin()">Login</div>
+        <div class="tab" onclick="showRegister()">Register</div>
+      </div>
+
+      <div id="loginForm">
+        <div class="form-group">
+          <label for="loginEmail">Email:</label>
+          <input type="email" id="loginEmail" required />
+        </div>
+        <button class="login-btn" onclick="login()">Login</button>
+      </div>
+
+      <div id="registerForm" class="hidden">
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" required />
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone:</label>
+          <input type="tel" id="phone" required />
+        </div>
+        <div class="form-group">
+          <label for="emergencyContact">Emergency Contact Email:</label>
+          <input type="email" id="emergencyContact" required />
+        </div>
+        <div class="form-group">
+          <label for="emergencyEmail">Emergency Contact Phone:</label>
+          <input type="tel" id="emergencyEmail" required />
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="isDriver" /> Register as Driver
+          </label>
+        </div>
+        <button class="register-btn" onclick="register()">Register</button>
+      </div>
+    </div>
+
+    <script>
+      let web3;
+      let contract;
+      // Update contract address with your deployed contract address from Ganache
+      const contractAddress = "0xfcc30f35e9eac49200E76E4e4e5a7d48309B6203"; // Replace with your actual deployed contract address
+      const contractABI = [
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_email",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_phone",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_emergencyContact",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_emergencyEmail",
+              type: "string",
+            },
+            {
+              internalType: "bool",
+              name: "_isDriver",
+              type: "bool",
+            },
+          ],
+          name: "register",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "login",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_userAddress",
+              type: "address",
+            },
+          ],
+          name: "getUser",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "string",
+                  name: "email",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "phone",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "emergencyContact",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "emergencyEmail",
+                  type: "string",
+                },
+                {
+                  internalType: "bool",
+                  name: "isDriver",
+                  type: "bool",
+                },
+                {
+                  internalType: "bool",
+                  name: "exists",
+                  type: "bool",
+                },
+              ],
+              internalType: "struct Auth.User",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+      ];
+
+      async function connectWallet() {
+        if (window.ethereum) {
+          try {
+            // Request account access
+            await window.ethereum.request({ method: "eth_requestAccounts" });
+
+            // Check if we're on the correct network (Ganache)
+            const chainId = await window.ethereum.request({
+              method: "eth_chainId",
+            });
+            if (chainId !== "0x539") {
+              // 1337 in hex
+              try {
+                await window.ethereum.request({
+                  method: "wallet_switchEthereumChain",
+                  params: [{ chainId: "0x539" }],
+                });
+              } catch (error) {
+                // If the network doesn't exist, add it
+                await window.ethereum.request({
+                  method: "wallet_addEthereumChain",
+                  params: [
+                    {
+                      chainId: "0x539",
+                      chainName: "Ganache",
+                      rpcUrls: ["http://127.0.0.1:8545"],
+                      nativeCurrency: {
+                        name: "ETH",
+                        symbol: "ETH",
+                        decimals: 18,
+                      },
+                    },
+                  ],
+                });
+              }
+            }
+
+            web3 = new Web3(window.ethereum);
+            contract = new web3.eth.Contract(contractABI, contractAddress);
+            alert("Wallet connected successfully!");
+          } catch (error) {
+            console.error("Error connecting wallet:", error);
+            alert("Error connecting wallet. Please try again.");
+          }
+        } else {
+          alert("Please install MetaMask to use this application!");
+        }
+      }
+
+      async function login() {
+        if (!web3) {
+          alert("Please connect your wallet first!");
+          return;
+        }
+
+        const email = document.getElementById("loginEmail").value;
+        try {
+          const accounts = await web3.eth.getAccounts();
+          const result = await contract.methods
+            .login()
+            .call({ from: accounts[0] });
+          if (result) {
+            window.location.href = "passengerpanel.html";
+          }
+        } catch (error) {
+          console.error("Login error:", error);
+          alert("Login failed. Please check your credentials.");
+        }
+      }
+
+      async function register() {
+        if (!web3) {
+          alert("Please connect your wallet first!");
+          return;
+        }
+
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+        const emergencyContact =
+          document.getElementById("emergencyContact").value;
+        const emergencyEmail = document.getElementById("emergencyEmail").value;
+        const isDriver = document.getElementById("isDriver").checked;
+
+        try {
+          const accounts = await web3.eth.getAccounts();
+          await contract.methods
+            .register(email, phone, emergencyContact, emergencyEmail, isDriver)
+            .send({ from: accounts[0] });
+
+          alert("Registration successful!");
+          showLogin();
+        } catch (error) {
+          console.error("Registration error:", error);
+          alert("Registration failed. Please try again.");
+        }
+      }
+
+      function showLogin() {
+        document.getElementById("loginForm").classList.remove("hidden");
+        document.getElementById("registerForm").classList.add("hidden");
+        document.querySelectorAll(".tab")[0].classList.add("active");
+        document.querySelectorAll(".tab")[1].classList.remove("active");
+      }
+
+      function showRegister() {
+        document.getElementById("loginForm").classList.add("hidden");
+        document.getElementById("registerForm").classList.remove("hidden");
+        document.querySelectorAll(".tab")[0].classList.remove("active");
+        document.querySelectorAll(".tab")[1].classList.add("active");
+      }
+    </script>
+  </body>
+</html>

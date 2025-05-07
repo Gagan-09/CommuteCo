@@ -276,6 +276,187 @@
         </form>
       </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script>
+      let web3;
+      let contract;
+      // Update contract address with your deployed contract address from Ganache
+      const contractAddress = "0xfcc30f35e9eac49200E76E4e4e5a7d48309B6203"; // Replace with your actual deployed contract address
+      const contractABI = [
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_email",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_phone",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_emergencyContact",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_emergencyEmail",
+              type: "string",
+            },
+            {
+              internalType: "bool",
+              name: "_isDriver",
+              type: "bool",
+            },
+          ],
+          name: "register",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "login",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_userAddress",
+              type: "address",
+            },
+          ],
+          name: "getUser",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "string",
+                  name: "email",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "phone",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "emergencyContact",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "emergencyEmail",
+                  type: "string",
+                },
+                {
+                  internalType: "bool",
+                  name: "isDriver",
+                  type: "bool",
+                },
+                {
+                  internalType: "bool",
+                  name: "exists",
+                  type: "bool",
+                },
+              ],
+              internalType: "struct Auth.User",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+      ];
+
+      async function init() {
+        if (window.ethereum) {
+          try {
+            // Request account access
+            await window.ethereum.request({ method: "eth_requestAccounts" });
+
+            // Check if we're on the correct network (Ganache)
+            const chainId = await window.ethereum.request({
+              method: "eth_chainId",
+            });
+            if (chainId !== "0x539") {
+              // 1337 in hex
+              try {
+                await window.ethereum.request({
+                  method: "wallet_switchEthereumChain",
+                  params: [{ chainId: "0x539" }],
+                });
+              } catch (error) {
+                // If the network doesn't exist, add it
+                await window.ethereum.request({
+                  method: "wallet_addEthereumChain",
+                  params: [
+                    {
+                      chainId: "0x539",
+                      chainName: "Ganache",
+                      rpcUrls: ["http://127.0.0.1:8545"],
+                      nativeCurrency: {
+                        name: "ETH",
+                        symbol: "ETH",
+                        decimals: 18,
+                      },
+                    },
+                  ],
+                });
+              }
+            }
+
+            web3 = new Web3(window.ethereum);
+            contract = new web3.eth.Contract(contractABI, contractAddress);
+
+            const accounts = await web3.eth.getAccounts();
+            const user = await contract.methods.getUser(accounts[0]).call();
+
+            document.querySelector(
+              ".account-info p:first-child strong"
+            ).textContent = user.email;
+            document.querySelector(
+              ".account-info p:nth-child(2)"
+            ).textContent = `Account ID: ${accounts[0]}`;
+
+            // Get ETH balance
+            const balance = await web3.eth.getBalance(accounts[0]);
+            const ethBalance = web3.utils.fromWei(balance, "ether");
+            document.querySelector(
+              ".account-info p:nth-child(3)"
+            ).textContent = `Account Balance: ${ethBalance} ETH`;
+          } catch (error) {
+            console.error("Error initializing:", error);
+            window.location.href = "login.html";
+          }
+        } else {
+          window.location.href = "login.html";
+        }
+      }
+
+      document.querySelector(".logout-button").addEventListener("click", () => {
+        window.location.href = "login.html";
+      });
+
+      document.querySelector(".switch-button").addEventListener("click", () => {
+        window.location.href = "driverpanel.html";
+      });
+
+      init();
+    </script>
     <script>
       var modal = document.getElementById("womenOnlyModal");
       var btn = document.getElementById("women-only-ride");
