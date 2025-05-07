@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>CarPooling - Login/Register</title>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <title>CarPooling - Driver Panel</title>
     <style>
       body {
         font-family: "Poppins", sans-serif;
@@ -41,9 +40,154 @@
         animation: fadeIn 1.5s ease;
       }
 
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h1 {
+        font-size: 2rem;
+        color: transparent;
+        background: linear-gradient(to right, #ff7e5f, #feb47b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 20px;
+      }
+
+      p {
+        margin-bottom: 10px;
+        font-size: 1rem;
+        color: #444;
+      }
+
+      .account-info {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .menu-option {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+        text-align: left;
+      }
+
+      .menu-option li {
+        background: rgba(255, 255, 255, 0.85);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: #555;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .menu-option li:hover {
+        background: linear-gradient(to right, #ff7e5f, #feb47b);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(255, 126, 95, 0.4);
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      button {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .switch-button {
+        background: linear-gradient(to right, #4facfe, #00f2fe);
+        color: white;
+      }
+
+      .switch-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(0, 242, 254, 0.4);
+      }
+
+      .logout-button {
+        background: linear-gradient(to right, #ff512f, #dd2476);
+        color: white;
+      }
+
+      .logout-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(221, 36, 118, 0.4);
+      }
+      .logo img {
+        width: 200px;
+        height: 200px;
+      }
+      input[type="text"],
+      input[type="email"],
+      input[type="tel"] {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+      }
+
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border-radius: 10px;
+        width: 80%;
+        max-width: 500px;
+        position: relative;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close:hover {
+        color: black;
+      }
+
       .form-group {
         margin-bottom: 15px;
-        text-align: left;
       }
 
       .form-group label {
@@ -52,118 +196,87 @@
         font-weight: bold;
       }
 
-      input[type="text"],
-      input[type="email"],
-      input[type="tel"],
-      input[type="password"] {
-        width: 100%;
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #ddd;
-        box-sizing: border-box;
-      }
-
-      button {
-        width: 100%;
-        padding: 12px;
-        border: none;
-        border-radius: 25px;
-        font-size: 1rem;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin-top: 10px;
-      }
-
-      .login-btn {
-        background: linear-gradient(to right, #4facfe, #00f2fe);
-        color: white;
-      }
-
-      .register-btn {
+      .modal-content button[type="submit"] {
         background: linear-gradient(to right, #ff7e5f, #feb47b);
         color: white;
-      }
-
-      .connect-wallet {
-        background: linear-gradient(to right, #ff512f, #dd2476);
-        color: white;
-        margin-bottom: 20px;
-      }
-
-      .tabs {
-        display: flex;
-        margin-bottom: 20px;
-      }
-
-      .tab {
-        flex: 1;
-        padding: 10px;
-        cursor: pointer;
-        background: rgba(255, 255, 255, 0.2);
+        padding: 10px 20px;
+        border: none;
         border-radius: 5px;
-        margin: 0 5px;
+        cursor: pointer;
+        width: 100%;
+        font-weight: bold;
       }
 
-      .tab.active {
-        background: rgba(255, 255, 255, 0.4);
-      }
-
-      .hidden {
-        display: none;
+      .modal-content button[type="submit"]:hover {
+        transform: scale(1.02);
       }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="logo">
-        <img src="logo.png" alt="Logo" style="width: 200px; height: 200px" />
+        <!-- <h1>REGISTER TO</h1> -->
+        <img src="logo.png" alt="Logo" />
       </div>
-      <h1>CarPooling</h1>
-
-      <button class="connect-wallet" onclick="connectWallet()">
-        Connect Wallet
-      </button>
-
-      <div class="tabs">
-        <div class="tab active" onclick="showLogin()">Login</div>
-        <div class="tab" onclick="showRegister()">Register</div>
+      <h1>Passenger Panel</h1>
+      <div class="account-info">
+        <p>Welcome <strong>Passenger-1 </strong></p>
+        <p><strong>Account ID: </strong>0xb8800zz259f67175b59e8f11436e17a</p>
+        <p><strong>Account Balance: </strong>98.120 ETH</p>
       </div>
-
-      <div id="loginForm">
-        <div class="form-group">
-          <label for="loginEmail">Email:</label>
-          <input type="email" id="loginEmail" required />
-        </div>
-        <button class="login-btn" onclick="login()">Login</button>
-      </div>
-
-      <div id="registerForm" class="hidden">
-        <div class="form-group">
-          <label for="email">Email:</label>
-          <input type="email" id="email" required />
-        </div>
-        <div class="form-group">
-          <label for="phone">Phone:</label>
-          <input type="tel" id="phone" required />
-        </div>
-        <div class="form-group">
-          <label for="emergencyContact">Emergency Contact Email:</label>
-          <input type="email" id="emergencyContact" required />
-        </div>
-        <div class="form-group">
-          <label for="emergencyEmail">Emergency Contact Phone:</label>
-          <input type="tel" id="emergencyEmail" required />
-        </div>
-        <div class="form-group">
-          <label>
-            <input type="checkbox" id="isDriver" /> Register as Driver
-          </label>
-        </div>
-        <button class="register-btn" onclick="register()">Register</button>
+      <ul class="menu-option">
+        <li>Booked Rides</li>
+        <li>View All Rides</li>
+        <li>
+          <a
+            href="leaflet/map_index.html"
+            style="text-decoration: none; color: inherit"
+            >Search By Location</a
+          >
+        </li>
+        <li id="women-only-ride">Women only Ride</li>
+      </ul>
+      <div class="buttons">
+        <!-- <button class="switch-button">Switch to Driver</button>
+        <button class="logout-button">Logout</button> -->
       </div>
     </div>
-
+    <div id="womenOnlyModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Register for Women Only Ride</h2>
+        <form id="womenOnlyForm">
+          <div class="form-group">
+            <label for="email">Email ID:</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone Number:</label>
+            <input type="tel" id="phone" name="phone" required />
+          </div>
+          <div class="form-group">
+            <label for="emergencyContact">Emergency Contact Email:</label>
+            <input
+              type="email"
+              id="emergencyContact"
+              name="emergencyContact"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="emergencyPhone">Emergency Contact Phone:</label>
+            <input
+              type="tel"
+              id="emergencyPhone"
+              name="emergencyPhone"
+              required
+            />
+          </div>
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
     <script>
       let web3;
       let contract;
@@ -269,7 +382,7 @@
         },
       ];
 
-      async function connectWallet() {
+      async function init() {
         if (window.ethereum) {
           try {
             // Request account access
@@ -308,77 +421,80 @@
 
             web3 = new Web3(window.ethereum);
             contract = new web3.eth.Contract(contractABI, contractAddress);
-            alert("Wallet connected successfully!");
+
+            const accounts = await web3.eth.getAccounts();
+            const user = await contract.methods.getUser(accounts[0]).call();
+
+            document.querySelector(
+              ".account-info p:first-child strong"
+            ).textContent = user.email;
+            document.querySelector(
+              ".account-info p:nth-child(2)"
+            ).textContent = `Account ID: ${accounts[0]}`;
+
+            // Get ETH balance
+            const balance = await web3.eth.getBalance(accounts[0]);
+            const ethBalance = web3.utils.fromWei(balance, "ether");
+            document.querySelector(
+              ".account-info p:nth-child(3)"
+            ).textContent = `Account Balance: ${ethBalance} ETH`;
           } catch (error) {
-            console.error("Error connecting wallet:", error);
-            alert("Error connecting wallet. Please try again.");
+            console.error("Error initializing:", error);
+            window.location.href = "login.html";
           }
         } else {
-          alert("Please install MetaMask to use this application!");
+          window.location.href = "login.html";
         }
       }
 
-      async function login() {
-        if (!web3) {
-          alert("Please connect your wallet first!");
-          return;
+      document.querySelector(".logout-button").addEventListener("click", () => {
+        window.location.href = "login.html";
+      });
+
+      document.querySelector(".switch-button").addEventListener("click", () => {
+        window.location.href = "driverpanel.html";
+      });
+
+      init();
+    </script>
+    <script>
+      var modal = document.getElementById("womenOnlyModal");
+      var btn = document.getElementById("women-only-ride");
+      var span = document.getElementsByClassName("close")[0];
+      btn.onclick = function () {
+        modal.style.display = "block";
+      };
+
+      span.onclick = function () {
+        modal.style.display = "none";
+      };
+
+      window.onclick = function (event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
         }
-
-        const email = document.getElementById("loginEmail").value;
-        try {
-          const accounts = await web3.eth.getAccounts();
-          const result = await contract.methods
-            .login()
-            .call({ from: accounts[0] });
-          if (result) {
-            window.location.href = "passengerpanel.html";
-          }
-        } catch (error) {
-          console.error("Login error:", error);
-          alert("Login failed. Please check your credentials.");
-        }
-      }
-
-      async function register() {
-        if (!web3) {
-          alert("Please connect your wallet first!");
-          return;
-        }
-
-        const email = document.getElementById("email").value;
-        const phone = document.getElementById("phone").value;
-        const emergencyContact =
-          document.getElementById("emergencyContact").value;
-        const emergencyEmail = document.getElementById("emergencyEmail").value;
-        const isDriver = document.getElementById("isDriver").checked;
-
-        try {
-          const accounts = await web3.eth.getAccounts();
-          await contract.methods
-            .register(email, phone, emergencyContact, emergencyEmail, isDriver)
-            .send({ from: accounts[0] });
-
-          alert("Registration successful!");
-          showLogin();
-        } catch (error) {
-          console.error("Registration error:", error);
-          alert("Registration failed. Please try again.");
-        }
-      }
-
-      function showLogin() {
-        document.getElementById("loginForm").classList.remove("hidden");
-        document.getElementById("registerForm").classList.add("hidden");
-        document.querySelectorAll(".tab")[0].classList.add("active");
-        document.querySelectorAll(".tab")[1].classList.remove("active");
-      }
-
-      function showRegister() {
-        document.getElementById("loginForm").classList.add("hidden");
-        document.getElementById("registerForm").classList.remove("hidden");
-        document.querySelectorAll(".tab")[0].classList.remove("active");
-        document.querySelectorAll(".tab")[1].classList.add("active");
-      }
+      };
+      document
+        .getElementById("womenOnlyForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          var email = document.getElementById("email").value;
+          var phone = document.getElementById("phone").value;
+          var emergencyContact =
+            document.getElementById("emergencyContact").value;
+          var emergencyPhone = document.getElementById("emergencyPhone").value;
+          console.log(
+            "Email:",
+            email,
+            "Phone:",
+            phone,
+            "Emergency Contact:",
+            emergencyContact,
+            "Emergency Phone:",
+            emergencyPhone
+          );
+          modal.style.display = "none";
+        });
     </script>
   </body>
 </html>
